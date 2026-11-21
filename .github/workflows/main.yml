@@ -9,25 +9,32 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "metabolic-update 2"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Install browser libraries
-        working-directory: .
         run: |
           sudo apt-get update
           sudo apt-get install -y libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2t64 libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 libatk-bridge2.0-0 libpango-1.0-0 libcairo2 libcups2
-      - name: Check files
-        run: ls -la public src
+      - name: Find the newest project folder
+        id: find
+        run: |
+          F=$(find . -name timing.ts -path '*/src/*' -not -path '*/node_modules/*' | head -n 1)
+          if [ -z "$F" ]; then echo "ERROR: src/timing.ts not found. The new files were NOT uploaded."; exit 1; fi
+          D=$(dirname "$(dirname "$F")")
+          echo "Using project folder: $D"
+          cat "$F"
+          ls -la "$D/public"
+          echo "dir=$D" >> "$GITHUB_OUTPUT"
       - run: npm install
+        working-directory: ${{ steps.find.outputs.dir }}
       - run: npx tsc --noEmit
+        working-directory: ${{ steps.find.outputs.dir }}
       - run: npx remotion render src/index.ts MetabolicMaster out/metabolic-master.mp4 --codec=h264 --crf=16 --pixel-format=yuv420p
+        working-directory: ${{ steps.find.outputs.dir }}
       - uses: actions/upload-artifact@v4
         with:
-          name: metabolic-master-${{ github.run_number }}
-          path: metabolic-update 2/out/metabolic-master.mp4
+          name: video-run-${{ github.run_number }}
+          path: ${{ steps.find.outputs.dir }}/out/metabolic-master.mp4
