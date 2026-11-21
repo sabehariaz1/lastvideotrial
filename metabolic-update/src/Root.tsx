@@ -2,7 +2,7 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {MetabolicShowcase, SCENE_DURATIONS, TRANSITION_FRAMES} from './MetabolicShowcase';
 
-// Sum of scenes minus one overlap per transition: 3726 - 7 * 18 = 3600 frames (120 s).
+// Sum of scene durations minus one overlap per transition (see timing.ts).
 export const TOTAL_DURATION_IN_FRAMES =
   SCENE_DURATIONS.reduce((a, b) => a + b, 0) - TRANSITION_FRAMES * (SCENE_DURATIONS.length - 1);
 

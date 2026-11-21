@@ -34,11 +34,11 @@ export const Scene: React.FC<{caption: string; source?: string; children: React.
       {[0, 1, 2].map((i) => (
         <div key={i} style={{position: 'absolute', width: 520, height: 520, borderRadius: 260, background: [C.amber, C.coral, C.green][i], opacity: 0.1, left: [100, 1250, 650][i] + Math.sin(f / 40 + i * 2) * 90, top: [620, -120, -260][i] + Math.cos(f / 50 + i) * 70}} />
       ))}
-      <div style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, boxSizing: 'border-box', padding: '64px 110px 210px', display: 'flex', flexDirection: 'column', gap: 32}}>
+      <div style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, boxSizing: 'border-box', padding: '64px 110px 220px', display: 'flex', flexDirection: 'column', gap: 32}}>
         {children}
       </div>
-      {source ? <div style={{position: 'absolute', left: 110, right: 110, bottom: 154, height: 30, fontSize: 22, color: C.sub, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...cap}}>{source}</div> : null}
-      <div style={{position: 'absolute', left: 110, right: 110, bottom: 56, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.card, border: `2px solid ${C.border}`, borderRadius: 45, fontSize: 36, fontWeight: 600, color: C.sub, ...cap}}>
+      {source ? <div style={{position: 'absolute', left: 110, right: 110, bottom: 150, height: 30, fontSize: 22, color: C.sub, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...cap}}>{source}</div> : null}
+      <div style={{position: 'absolute', left: 110, right: 110, bottom: 36, height: 84, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.card, border: `2px solid ${C.border}`, borderRadius: 42, fontSize: 36, fontWeight: 600, color: C.sub, ...cap}}>
         {caption}
       </div>
     </AbsoluteFill>
@@ -66,4 +66,10 @@ export const Words: React.FC<{text: string; size: number; delay?: number}> = ({t
       })}
     </div>
   );
+};
+
+export const CountUp: React.FC<{to: number; start: number; frames?: number}> = ({to, start, frames = 50}) => {
+  const frame = useCurrentFrame();
+  const p = Math.min(1, Math.max(0, (frame - start) / frames));
+  return <>{Math.round(to * (1 - Math.pow(1 - p, 3)))}</>;
 };

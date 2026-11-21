@@ -1,5 +1,6 @@
 import React from 'react';
 import {C, Card, Heading, Scene, useSpring} from './ui';
+import {PROG_CARDS} from '../timing';
 
 const Dot: React.FC<{i: number}> = ({i}) => {
   const s = useSpring(10 + i * 0.7, 12);
@@ -17,13 +18,13 @@ export const ProgressionScene: React.FC = () => (
         </svg>
       </Card>
       <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 28, minHeight: 0}}>
-        <Card delay={30} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10}}>
+        <Card delay={PROG_CARDS[0] ?? 30} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10}}>
           <div style={{fontSize: 48, fontWeight: 800, color: C.coral, lineHeight: 1.1}}>5 to 10 in 100</div>
           <div style={{fontSize: 30, color: C.sub}}>people with prediabetes develop type 2 diabetes each year [4]</div>
         </Card>
-        <Card delay={50} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10}}>
+        <Card delay={PROG_CARDS[1] ?? 50} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10}}>
           <div style={{fontSize: 48, fontWeight: 800, color: C.green, lineHeight: 1.1}}>Many go back to normal</div>
-          <div style={{fontSize: 30, color: C.sub}}>with healthy changes and regular checks [4]</div>
+          <div style={{fontSize: 30, color: C.sub}}>after healthy lifestyle changes [4]</div>
         </Card>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import {interpolate, useCurrentFrame} from 'remotion';
-import {C, Card, Heading, Scene, useSpring} from './ui';
+import {C, Card, CountUp, Heading, Scene, useSpring} from './ui';
+import {GAUGE_SILENT, GAUGE_STAT} from '../timing';
 
 const CX = 400;
 const CY = 400;
@@ -18,9 +19,9 @@ export const PrevalenceAndGaugeScene: React.FC = () => {
   const t = 0.08 + 0.47 * useSpring(80, 7);
   const [nx, ny] = pt(t, R - 50);
   const zones: Array<[string, string, string]> = [
-    ['Normal', 'under 5.5 mmol/L', C.teal],
-    ['Prediabetes', '5.5 to 6.9 mmol/L', C.amber],
-    ['Diabetes', '7.0 mmol/L or more', C.coral],
+    ['Normal', '< 5.5 mmol/L', C.teal],
+    ['Prediabetes', '5.5–6.9 mmol/L', C.amber],
+    ['Diabetes', '≥ 7.0 mmol/L', C.coral],
   ];
   const segs: Array<[number, number, string, number]> = [[0, 0.4, C.teal, 10], [0.4, 0.7, C.amber, 30], [0.7, 1, C.coral, 50]];
   return (
@@ -28,7 +29,7 @@ export const PrevalenceAndGaugeScene: React.FC = () => {
       <Heading>Prediabetes is common, and often silent.</Heading>
       <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 36}}>
         <Card delay={6} from="left" style={{flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between'}}>
-          <svg viewBox="0 0 800 440" width="100%" height="330">
+          <svg viewBox="30 50 740 400" width="100%" height="420">
             {segs.map(([a, b, col, s]) => (
               <path key={col} d={arc(a, b)} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - interpolate(frame, [s, s + 25], [0, 1], clamp)} stroke={col} strokeWidth="56" fill="none" />
             ))}
@@ -45,11 +46,16 @@ export const PrevalenceAndGaugeScene: React.FC = () => {
             ))}
           </div>
         </Card>
-        <Card delay={20} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16}}>
-          <div style={{fontSize: 52, fontWeight: 800, color: C.coral, lineHeight: 1.1}}>About 540 million</div>
-          <div style={{fontSize: 30, color: C.sub}}>adults worldwide have impaired glucose tolerance [3]</div>
-          <div style={{fontSize: 30, fontWeight: 700}}>Most feel nothing at all.</div>
-        </Card>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 28, minHeight: 0}}>
+          <Card delay={GAUGE_SILENT} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10}}>
+            <div style={{fontSize: 46, fontWeight: 800, color: C.coral, lineHeight: 1.1}}>Often silent</div>
+            <div style={{fontSize: 30, color: C.sub}}>Most people feel completely fine.</div>
+          </Card>
+          <Card delay={GAUGE_STAT} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10}}>
+            <div style={{fontSize: 50, fontWeight: 800, color: C.amber, lineHeight: 1.1}}>~<CountUp to={540} start={GAUGE_STAT} /> million</div>
+            <div style={{fontSize: 28, color: C.sub}}>adults worldwide have impaired glucose tolerance [3]</div>
+          </Card>
+        </div>
       </div>
     </Scene>
   );
