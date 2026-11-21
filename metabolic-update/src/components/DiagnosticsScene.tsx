@@ -3,9 +3,9 @@ import {interpolate, useCurrentFrame} from 'remotion';
 import {C, Card, Heading, Scene, useFloat, useIn, useSpring} from './ui';
 
 const TESTS: Array<[string, string]> = [
-  ['Fasting blood sugar', '100 to 125 mg/dL'],
-  ['A1C (3-month average)', '5.7% to 6.4%'],
-  ['2-hour sugar test', '140 to 199 mg/dL'],
+  ['Fasting blood sugar [2]', '5.5 to 6.9 mmol/L'],
+  ['A1C, 3-month average [2]', '6.0% to 6.4%'],
+  ['2-hour sugar test [1]', '7.8 to 11.0 mmol/L'],
 ];
 
 export const DiagnosticsScene: React.FC = () => {
@@ -16,7 +16,7 @@ export const DiagnosticsScene: React.FC = () => {
   const check = interpolate(frame, [70, 95], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const badge = useSpring(65, 9);
   return (
-    <Scene caption="Ask your doctor for a simple blood test">
+    <Scene caption="Ask your doctor for a simple blood test" source="Sources: [1] WHO/IDF 2006; [2] NICE PH38. Ranges differ slightly between guidelines.">
       <Heading>A blood test gives a clear answer.</Heading>
       <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 44}}>
         <div style={{flex: 0.9, minHeight: 0, ...art}}>

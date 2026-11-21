@@ -18,7 +18,7 @@ const Tile: React.FC<{label: string; color: string; i: number}> = ({label, color
 };
 
 export const RiskMatrixScene: React.FC = () => (
-  <Scene caption="Each one can add points to your score">
+  <Scene caption="Each one can add points to your score" source="Sources: [8] Prediabetes Risk Test; [2] NICE PH38">
     <Heading>What raises your score?</Heading>
     <div style={{flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: 28}}>
       {FACTORS.map((f, i) => (

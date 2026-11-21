@@ -1,13 +1,8 @@
 import React from 'react';
-import {C, Card, Heading, Scene, useIn, useSpring} from './ui';
+import {interpolate, useCurrentFrame} from 'remotion';
+import {C, Card, Heading, Scene, useSpring} from './ui';
 
-const TIPS = ['Move 150 minutes a week', 'Eat more whole foods', 'Lose 5 to 7% of body weight if you carry extra'];
-const REFS: Array<[string, string]> = [
-  ['WHO: Diabetes fact sheet', 'who.int/news-room/fact-sheets/detail/diabetes'],
-  ['NICE: Preventing type 2 diabetes (PH38)', 'nice.org.uk/guidance/ph38'],
-  ['IDF Diabetes Atlas', 'diabetesatlas.org'],
-  ['NHS: Type 2 diabetes', 'nhs.uk/conditions/type-2-diabetes'],
-];
+const TIPS = ['Move at least 150 minutes a week [7]', 'Eat more whole foods [6]', 'Lose at least 5% of body weight if you carry extra [6]'];
 
 const Tip: React.FC<{text: string; i: number}> = ({text, i}) => {
   const s = useSpring(16 + i * 8, 8);
@@ -19,24 +14,25 @@ const Tip: React.FC<{text: string; i: number}> = ({text, i}) => {
   );
 };
 
-const Ref: React.FC<{name: string; url: string; i: number}> = ({name, url, i}) => (
-  <div style={useIn(40 + i * 7, 'right')}>
-    <div style={{fontSize: 28, fontWeight: 700}}>{name}</div>
-    <div style={{fontSize: 22, color: C.sub}}>{url}</div>
-  </div>
-);
-
-export const PreventionAndRefsScene: React.FC = () => (
-  <Scene caption="Not medical advice. Talk to your doctor.">
-    <Heading>Good news: you can lower your risk.</Heading>
-    <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 36}}>
-      <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 22, justifyContent: 'center'}}>
-        {TIPS.map((t, i) => <Tip key={t} text={t} i={i} />)}
+export const PreventionAndRefsScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const w = interpolate(frame, [40, 100], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  return (
+    <Scene caption="Small changes can make a big difference" source="Sources: [6] Tuomilehto et al., NEJM 2001; [7] WHO physical activity guidelines 2020">
+      <Heading>Good news: you can lower your risk.</Heading>
+      <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 36}}>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 22, justifyContent: 'center'}}>
+          {TIPS.map((t, i) => <Tip key={t} text={t} i={i} />)}
+        </div>
+        <Card delay={30} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 14}}>
+          <div style={{fontSize: 110, fontWeight: 800, color: C.green, lineHeight: 1}}>58%</div>
+          <div style={{fontSize: 32, fontWeight: 700}}>lower risk of diabetes with lifestyle changes [6]</div>
+          <div style={{fontSize: 24, color: C.sub, marginTop: 10}}>Usual advice</div>
+          <div style={{height: 34, borderRadius: 17, background: C.amber, width: `${100 * w}%`}} />
+          <div style={{fontSize: 24, color: C.sub}}>Lifestyle program</div>
+          <div style={{height: 34, borderRadius: 17, background: C.green, width: `${42 * w}%`}} />
+        </Card>
       </div>
-      <Card delay={30} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16}}>
-        <div style={{fontSize: 38, fontWeight: 800, color: C.teal}}>References</div>
-        {REFS.map(([n, u], i) => <Ref key={n} name={n} url={u} i={i} />)}
-      </Card>
-    </div>
-  </Scene>
-);
+    </Scene>
+  );
+};

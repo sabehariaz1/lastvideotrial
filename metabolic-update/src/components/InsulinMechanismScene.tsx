@@ -3,7 +3,7 @@ import {interpolate, useCurrentFrame} from 'remotion';
 import {C, Card, Heading, Scene} from './ui';
 
 const Panel: React.FC<{ok: boolean}> = ({ok}) => {
-  const frame = useCurrentFrame();
+  const frame = useCurrentFrame() % 180;
   const col = ok ? C.teal : C.coral;
   const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
   const keyY = ok ? interpolate(frame, [20, 60], [0, 62], clamp) : 14 * Math.sin(frame / 6) ** 2;
@@ -29,7 +29,7 @@ const Panel: React.FC<{ok: boolean}> = ({ok}) => {
 };
 
 export const InsulinMechanismScene: React.FC = () => (
-  <Scene caption="Insulin is the key. Sugar is the fuel.">
+  <Scene caption="Insulin is the key. Sugar is the fuel." source="Source: [5] Petersen & Shulman, Physiological Reviews 2018">
     <Heading>Insulin lets sugar into your cells.</Heading>
     <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 36}}>
       <Card delay={8} from="left" style={{flex: 1}}>

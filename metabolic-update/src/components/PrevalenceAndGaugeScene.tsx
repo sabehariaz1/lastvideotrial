@@ -18,13 +18,13 @@ export const PrevalenceAndGaugeScene: React.FC = () => {
   const t = 0.08 + 0.47 * useSpring(80, 7);
   const [nx, ny] = pt(t, R - 50);
   const zones: Array<[string, string, string]> = [
-    ['Normal', 'under 100 mg/dL', C.teal],
-    ['Prediabetes', '100 to 125 mg/dL', C.amber],
-    ['Diabetes', '126 mg/dL or more', C.coral],
+    ['Normal', 'under 5.5 mmol/L', C.teal],
+    ['Prediabetes', '5.5 to 6.9 mmol/L', C.amber],
+    ['Diabetes', '7.0 mmol/L or more', C.coral],
   ];
   const segs: Array<[number, number, string, number]> = [[0, 0.4, C.teal, 10], [0.4, 0.7, C.amber, 30], [0.7, 1, C.coral, 50]];
   return (
-    <Scene caption="Most people with prediabetes do not know it">
+    <Scene caption="Most people with prediabetes do not know it" source="Sources: [1] WHO/IDF 2006; [2] NICE PH38; [3] IDF Diabetes Atlas 2021. Cut-offs vary slightly by guideline.">
       <Heading>Prediabetes is common, and often silent.</Heading>
       <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 36}}>
         <Card delay={6} from="left" style={{flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between'}}>
@@ -46,8 +46,9 @@ export const PrevalenceAndGaugeScene: React.FC = () => {
           </div>
         </Card>
         <Card delay={20} from="right" style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16}}>
-          <div style={{fontSize: 56, fontWeight: 800, color: C.coral, lineHeight: 1.1}}>Early signs are easy to miss.</div>
-          <div style={{fontSize: 34, color: C.sub}}>A simple check can catch it early.</div>
+          <div style={{fontSize: 52, fontWeight: 800, color: C.coral, lineHeight: 1.1}}>About 540 million</div>
+          <div style={{fontSize: 30, color: C.sub}}>adults worldwide have impaired glucose tolerance [3]</div>
+          <div style={{fontSize: 30, fontWeight: 700}}>Most feel nothing at all.</div>
         </Card>
       </div>
     </Scene>

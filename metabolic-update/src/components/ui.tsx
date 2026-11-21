@@ -26,7 +26,7 @@ export const useIn = (delay = 0, from: From = 'pop'): React.CSSProperties => {
 };
 
 // Safe layout: content box ends 210px above the bottom; caption bar sits in the strip below it.
-export const Scene: React.FC<{caption: string; children: React.ReactNode}> = ({caption, children}) => {
+export const Scene: React.FC<{caption: string; source?: string; children: React.ReactNode}> = ({caption, source, children}) => {
   const cap = useIn(12, 'up');
   const f = useCurrentFrame();
   return (
@@ -37,6 +37,7 @@ export const Scene: React.FC<{caption: string; children: React.ReactNode}> = ({c
       <div style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, boxSizing: 'border-box', padding: '64px 110px 210px', display: 'flex', flexDirection: 'column', gap: 32}}>
         {children}
       </div>
+      {source ? <div style={{position: 'absolute', left: 110, right: 110, bottom: 154, height: 30, fontSize: 22, color: C.sub, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...cap}}>{source}</div> : null}
       <div style={{position: 'absolute', left: 110, right: 110, bottom: 56, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.card, border: `2px solid ${C.border}`, borderRadius: 45, fontSize: 36, fontWeight: 600, color: C.sub, ...cap}}>
         {caption}
       </div>

@@ -10,10 +10,12 @@ export const ScoreHookScene: React.FC = () => {
   const pop = useSpring(75, 9);
   const ring = interpolate(frame, [75, 110], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
-    <Scene caption="Take the 1-minute risk test">
+    <Scene caption="Take the 1-minute risk test" source="Risk score cut-off of 5: Prediabetes Risk Test, American Diabetes Association / CDC [8]">
       <div style={{flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', gap: 60}}>
         <div style={{flex: 1.3}}>
           <Words text="If your score is 5 or higher, you are at high risk of developing prediabetes." size={74} />
+          <div style={{height: 28}} />
+          <div style={{color: C.sub}}><Words text="Let’s find out what that means." size={42} delay={170} /></div>
         </div>
         <div style={{flex: 1, height: 560, ...art}}>
           <svg viewBox="0 0 520 520" width="100%" height="100%" style={{transform: `translateY(${float}px)`}}>
