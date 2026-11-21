@@ -4,6 +4,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: 1122
+
 jobs:
   render:
     runs-on: ubuntu-latest
@@ -18,4 +22,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: metabolic-master-${{ github.run_number }}
-          path: out/metabolic-master.mp4
+          path: 1122/out/metabolic-master.mp4
