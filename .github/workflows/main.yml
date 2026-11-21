@@ -4,10 +4,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: 1122
-
 jobs:
   render:
     runs-on: ubuntu-latest
@@ -16,10 +12,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Unzip project
+        run: |
+          test -f metabolic-update.zip
+          rm -rf build && mkdir build
+          unzip -q metabolic-update.zip -d build
+          ls -R build/src build/public
       - run: npm install
+        working-directory: build
       - run: npx tsc --noEmit
+        working-directory: build
       - run: npx remotion render src/index.ts MetabolicMaster out/metabolic-master.mp4 --codec=h264 --crf=16 --pixel-format=yuv420p
+        working-directory: build
       - uses: actions/upload-artifact@v4
         with:
           name: metabolic-master-${{ github.run_number }}
-          path: 1122/out/metabolic-master.mp4
+          path: build/out/metabolic-master.mp4
