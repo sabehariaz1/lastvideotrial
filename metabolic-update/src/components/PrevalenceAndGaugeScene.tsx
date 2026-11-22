@@ -19,13 +19,13 @@ export const PrevalenceAndGaugeScene: React.FC = () => {
   const t = 0.08 + 0.47 * useSpring(80, 7);
   const [nx, ny] = pt(t, R - 50);
   const zones: Array<[string, string, string]> = [
-    ['Normal', '< 5.5 mmol/L', C.teal],
-    ['Prediabetes', '5.5–6.9 mmol/L', C.amber],
-    ['Diabetes', '≥ 7.0 mmol/L', C.coral],
+    ['Normal', '< 100 mg/dL', C.teal],
+    ['Prediabetes', '100–125 mg/dL', C.amber],
+    ['Diabetes', '≥ 126 mg/dL', C.coral],
   ];
   const segs: Array<[number, number, string, number]> = [[0, 0.4, C.teal, 10], [0.4, 0.7, C.amber, 30], [0.7, 1, C.coral, 50]];
   return (
-    <Scene caption="Most people with prediabetes do not know it" source="Sources: [1] WHO/IDF 2006; [2] NICE PH38; [3] IDF Diabetes Atlas 2021. Cut-offs vary slightly by guideline.">
+    <Scene caption="Most people with prediabetes do not know it" source="Sources: [1] WHO/IDF 2006; [2] NICE PH38; [3] IDF Diabetes Atlas 2021. Values in mg/dL; cut-offs vary slightly by guideline.">
       <Heading>Prediabetes is common, and often silent.</Heading>
       <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 36}}>
         <Card delay={6} from="left" style={{flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between'}}>

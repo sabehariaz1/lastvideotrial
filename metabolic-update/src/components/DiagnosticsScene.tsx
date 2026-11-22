@@ -4,9 +4,9 @@ import {C, Card, Heading, Scene, useFloat, useIn, useSpring} from './ui';
 import {DIAG_CARDS} from '../timing';
 
 const TESTS: Array<[string, string, string]> = [
-  ['Fasting blood sugar [2]', '5.5–6.9 mmol/L', 'Diabetes: ≥ 7.0 mmol/L'],
-  ['A1C, 3-month average [2]', '42–47 mmol/mol (6.0–6.4%)', 'Diabetes: ≥ 48 mmol/mol (6.5%)'],
-  ['2-hour sugar test [1]', '7.8–11.0 mmol/L', 'Diabetes: ≥ 11.1 mmol/L'],
+  ['Fasting blood sugar [2]', '100–125 mg/dL', 'Diabetes: ≥ 126 mg/dL'],
+  ['A1C, 3-month average [2]', '6.0–6.4%', 'Diabetes: ≥ 6.5%'],
+  ['2-hour sugar test [1]', '140–199 mg/dL', 'Diabetes: ≥ 200 mg/dL'],
 ];
 
 export const DiagnosticsScene: React.FC = () => {
@@ -17,7 +17,7 @@ export const DiagnosticsScene: React.FC = () => {
   const check = interpolate(frame, [70, 95], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const badge = useSpring(65, 9);
   return (
-    <Scene caption="Ask your doctor which test is right for you" source="Prediabetes range shown. Sources: [1] WHO/IDF 2006; [2] NICE PH38. Ranges differ slightly between guidelines.">
+    <Scene caption="Ask your doctor which test is right for you" source="Prediabetes range shown. Sources: [1] WHO/IDF 2006; [2] NICE PH38. Converted to mg/dL; ranges differ slightly between guidelines.">
       <Heading>A blood test shows where you stand.</Heading>
       <div style={{flex: 1, minHeight: 0, display: 'flex', gap: 40}}>
         <div style={{flex: 0.8, minHeight: 0, ...art}}>
