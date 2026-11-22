@@ -1,40 +1,102 @@
-name: Render
-on:
-  workflow_dispatch:
+name: Render Manim Video
 
-concurrency:
-  group: render
-  cancel-in-progress: true
+on:
+  push:
+    branches: [main]
+    paths:
+      - "main.py"
+      - "requirements.txt"
+      - "*.mp3"
+      - ".github/workflows/render-manim.yml"
+  workflow_dispatch:
+    inputs:
+      quality:
+        description: "Manim quality flag (-ql for 480p15, -qh for 1080p30)"
+        required: true
+        default: "-qh"
+        type: choice
+        options:
+          - "-ql"
+          - "-qm"
+          - "-qh"
+
+permissions:
+  contents: write
 
 jobs:
-  render:
+  build-and-render:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: 20
-      - name: Install browser libraries
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install system dependencies (Manim + FFmpeg)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2t64 libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 libatk-bridge2.0-0 libpango-1.0-0 libcairo2 libcups2
-      - name: Find the newest project folder
-        id: find
+          sudo apt-get install -y \
+            ffmpeg \
+            libcairo2-dev \
+            libpango1.0-dev \
+            pkg-config \
+            python3-dev
+
+      - name: Install Python packages
         run: |
-          F=$(find . -name timing.ts -path '*/src/*' -not -path '*/node_modules/*' | head -n 1)
-          if [ -z "$F" ]; then echo "ERROR: src/timing.ts not found. The new files were NOT uploaded."; exit 1; fi
-          D=$(dirname "$(dirname "$F")")
-          echo "Using project folder: $D"
-          cat "$F"
-          ls -la "$D/public"
-          echo "dir=$D" >> "$GITHUB_OUTPUT"
-      - run: npm install
-        working-directory: ${{ steps.find.outputs.dir }}
-      - run: npx tsc --noEmit
-        working-directory: ${{ steps.find.outputs.dir }}
-      - run: npx remotion render src/index.ts MetabolicMaster out/metabolic-master.mp4 --codec=h264 --crf=16 --pixel-format=yuv420p
-        working-directory: ${{ steps.find.outputs.dir }}
-      - uses: actions/upload-artifact@v4
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Render Manim master scene
+        env:
+          QUALITY: ${{ github.event.inputs.quality || '-qh' }}
+        run: |
+          manim $QUALITY main.py MetabolicMasterManim
+
+      - name: Locate rendered video and mux audio tracks
+        run: |
+          mkdir -p dist
+          SILENT_MP4=$(find media/videos/main -name "MetabolicMasterManim.mp4" | head -n 1)
+          echo "Found silent render: $SILENT_MP4"
+
+          DUR=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SILENT_MP4")
+          FADE_OUT_START=$(python3 -c "print(max(0.0, float('$DUR') - 1.0))")
+
+          if [ -f "voiceover.mp3" ] && [ -f "ambient-bed-v4.mp3" ] && [ -f "sfx.mp3" ]; then
+            ffmpeg -y \
+              -i "$SILENT_MP4" \
+              -i "voiceover.mp3" \
+              -stream_loop -1 -i "ambient-bed-v4.mp3" \
+              -i "sfx.mp3" \
+              -filter_complex "\
+                [1:a]volume=1.0[vo]; \
+                [2:a]volume=0.22,afade=t=in:st=0:d=1,afade=t=out:st=${FADE_OUT_START}:d=1[amb]; \
+                [3:a]volume=0.6[sfx]; \
+                [vo][amb][sfx]amix=inputs=3:duration=first:dropout_transition=0[aout]" \
+              -map 0:v:0 -map "[aout]" \
+              -c:v copy -c:a aac -b:a 192k \
+              -shortest dist/MetabolicMasterManim.mp4
+          else
+            cp "$SILENT_MP4" dist/MetabolicMasterManim.mp4
+          fi
+
+      - name: Upload rendered MP4 artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: video-run-${{ github.run_number }}
-          path: ${{ steps.find.outputs.dir }}/out/metabolic-master.mp4
+          name: metabolic-master-manim
+          path: dist/MetabolicMasterManim.mp4
+          retention-days: 30
+
+      - name: Attach MP4 to latest GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-render
+          name: Latest Manim Render
+          files: dist/MetabolicMasterManim.mp4
+          prerelease: true
