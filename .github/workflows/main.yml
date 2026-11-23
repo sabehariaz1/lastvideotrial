@@ -7,7 +7,7 @@ on:
       - "main.py"
       - "requirements.txt"
       - "*.mp3"
-      - ".github/workflows/render-manim.yml"
+      - ".github/workflows/main.yml"
   workflow_dispatch:
     inputs:
       quality:
@@ -26,7 +26,6 @@ permissions:
 jobs:
   build-and-render:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,54 +34,44 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
 
       - name: Install system dependencies (Manim + FFmpeg)
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            ffmpeg \
-            libcairo2-dev \
-            libpango1.0-dev \
-            pkg-config \
-            python3-dev
+          sudo apt-get install -y ffmpeg libcairo2-dev libpango1.0-dev pkg-config
 
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install manim
+          fi
 
       - name: Render Manim master scene
-        env:
-          QUALITY: ${{ github.event.inputs.quality || '-qh' }}
         run: |
-          manim $QUALITY main.py MetabolicMasterManim
+          QUALITY="${{ inputs.quality || '-qh' }}"
+          mkdir -p dist
+          if [ -f main.py ]; then
+            manim $QUALITY main.py
+          else
+            echo "Warning: main.py not found in repository root."
+            exit 1
+          fi
 
       - name: Locate rendered video and mux audio tracks
         run: |
           mkdir -p dist
-          SILENT_MP4=$(find media/videos/main -name "MetabolicMasterManim.mp4" | head -n 1)
-          echo "Found silent render: $SILENT_MP4"
-
-          DUR=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SILENT_MP4")
-          FADE_OUT_START=$(python3 -c "print(max(0.0, float('$DUR') - 1.0))")
-
-          if [ -f "voiceover.mp3" ] && [ -f "ambient-bed-v4.mp3" ] && [ -f "sfx.mp3" ]; then
-            ffmpeg -y \
-              -i "$SILENT_MP4" \
-              -i "voiceover.mp3" \
-              -stream_loop -1 -i "ambient-bed-v4.mp3" \
-              -i "sfx.mp3" \
-              -filter_complex "\
-                [1:a]volume=1.0[vo]; \
-                [2:a]volume=0.22,afade=t=in:st=0:d=1,afade=t=out:st=${FADE_OUT_START}:d=1[amb]; \
-                [3:a]volume=0.6[sfx]; \
-                [vo][amb][sfx]amix=inputs=3:duration=first:dropout_transition=0[aout]" \
-              -map 0:v:0 -map "[aout]" \
-              -c:v copy -c:a aac -b:a 192k \
-              -shortest dist/MetabolicMasterManim.mp4
+          RENDERED_MP4=$(find media/videos -name "*.mp4" | head -n 1 || true)
+          if [ -z "$RENDERED_MP4" ]; then
+            echo "No rendered MP4 found under media/videos."
+            exit 1
+          fi
+          if [ -f voiceover.mp3 ]; then
+            ffmpeg -y -i "$RENDERED_MP4" -i voiceover.mp3 -c:v copy -c:a aac -b:a 192k -shortest dist/MetabolicMasterManim.mp4
           else
-            cp "$SILENT_MP4" dist/MetabolicMasterManim.mp4
+            cp "$RENDERED_MP4" dist/MetabolicMasterManim.mp4
           fi
 
       - name: Upload rendered MP4 artifact
@@ -99,4 +88,3 @@ jobs:
           tag_name: latest-render
           name: Latest Manim Render
           files: dist/MetabolicMasterManim.mp4
-          prerelease: true
