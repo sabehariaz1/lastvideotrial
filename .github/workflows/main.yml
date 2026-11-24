@@ -3,6 +3,10 @@ name: Render video
 on:
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: metabolic-score-studio
+
 jobs:
   render:
     runs-on: ubuntu-24.04
@@ -30,4 +34,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: prediabetes-explainer
-          path: out/prediabetes-explainer.mp4
+          path: metabolic-score-studio/out/prediabetes-explainer.mp4
