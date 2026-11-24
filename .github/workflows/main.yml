@@ -1,26 +1,16 @@
-name: Render video
+name: Render Arabic video
 
 on:
   workflow_dispatch:
-    inputs:
-      folder:
-        description: Project folder
-        default: metabolic-score-studio-ar
-      composition:
-        description: Composition id
-        default: MetabolicMasterAR
-      output:
-        description: Output file name
-        default: prediabetes-explainer-ar.mp4
 
 defaults:
   run:
-    working-directory: ${{ inputs.folder }}
+    working-directory: metabolic-score-studio-ar
 
 jobs:
   render:
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -28,20 +18,32 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install system libraries for Chrome
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install system libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3 libdbus-1-3 libatk1.0-0 libasound2t64 \
+          sudo apt-get install -y ffmpeg libnss3 libdbus-1-3 libatk1.0-0 libasound2t64 \
             libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 \
             libgbm-dev libatk-bridge2.0-0 libcups2 libpango-1.0-0 libcairo2
+
+      - name: Install Python packages
+        run: pip install edge-tts gTTS
+
+      - name: Build Arabic narration, timing and sound effects
+        run: python3 scripts/build_audio.py
 
       - name: Install dependencies
         run: npm install
 
       - name: Render
-        run: npx remotion render src/index.ts ${{ inputs.composition }} out/${{ inputs.output }}
+        run: npx remotion render src/index.ts MetabolicMasterAR out/prediabetes-explainer-ar.mp4
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.output }}
-          path: ${{ inputs.folder }}/out/${{ inputs.output }}
+          name: prediabetes-explainer-ar
+          path: |
+            metabolic-score-studio-ar/out/prediabetes-explainer-ar.mp4
+            metabolic-score-studio-ar/public/voiceover-ar.mp3
