@@ -24,13 +24,17 @@ jobs:
 
       - name: Install system libraries
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg libnss3 libdbus-1-3 libatk1.0-0 libasound2t64 \
+          sudo apt-get install -y libnss3 libdbus-1-3 libatk1.0-0 libasound2t64 \
             libxrandr2 libxkbcommon-dev libxfixes3 libxcomposite1 libxdamage1 \
             libgbm-dev libatk-bridge2.0-0 libcups2 libpango-1.0-0 libcairo2
 
       - name: Install Python packages
-        run: pip install edge-tts gTTS
+        run: pip install edge-tts gTTS imageio-ffmpeg
+
+      - name: Check project files
+        run: |
+          ls scripts
+          test -f scripts/build_audio.py
 
       - name: Build Arabic narration, timing and sound effects
         run: python3 scripts/build_audio.py
