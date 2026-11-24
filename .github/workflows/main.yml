@@ -2,10 +2,20 @@ name: Render video
 
 on:
   workflow_dispatch:
+    inputs:
+      folder:
+        description: Project folder
+        default: metabolic-score-studio-ar
+      composition:
+        description: Composition id
+        default: MetabolicMasterAR
+      output:
+        description: Output file name
+        default: prediabetes-explainer-ar.mp4
 
 defaults:
   run:
-    working-directory: metabolic-score-studio
+    working-directory: ${{ inputs.folder }}
 
 jobs:
   render:
@@ -29,9 +39,9 @@ jobs:
         run: npm install
 
       - name: Render
-        run: npx remotion render src/index.ts MetabolicMaster out/prediabetes-explainer.mp4
+        run: npx remotion render src/index.ts ${{ inputs.composition }} out/${{ inputs.output }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: prediabetes-explainer
-          path: metabolic-score-studio/out/prediabetes-explainer.mp4
+          name: ${{ inputs.output }}
+          path: ${{ inputs.folder }}/out/${{ inputs.output }}
